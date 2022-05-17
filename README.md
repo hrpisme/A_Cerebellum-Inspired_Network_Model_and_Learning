@@ -1,2 +1,2 @@
 # A_Cerebellum-Inspired_Network_Model_and_Learning
-论文复现
+MBCI-puma560
