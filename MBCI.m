@@ -1,6 +1,6 @@
     clear;clc;
-%    6R»úÆ÷ÈËÄ£ĞÍ£¬modified puma560¡£
-%    ¶¨Òå»úÆ÷ÈË a--Á¬¸Ë³¤¶È£¬d--Á¬¸ËÆ«ÒÆÁ¿
+%    6Ræœºå™¨äººæ¨¡å‹ï¼Œmodified puma560ã€‚
+%    å®šä¹‰æœºå™¨äºº a--è¿æ†é•¿åº¦ï¼Œd--è¿æ†åç§»é‡
     a2=0.4318;a3=0.02032;d2=0.14909;d4=0.43307;
 %		     thetai    di      ai-1        alphai-1
     L1 = Link([pi/2    0       0               0], 'modified');
@@ -12,72 +12,72 @@
     robot = SerialLink([L1,L2,L3,L4,L5,L6]);
     robot.name = 'modified puma560';
 %   robot.display();
-%	robot.teach(); %  »¥¶¯
+%	robot.teach(); %  äº’åŠ¨
    
     Td=20;tao=0.01;
-%   Ä¿±ê¹ì¼£Í¼ÏñÉú³É
+%   ç›®æ ‡è½¨è¿¹å›¾åƒç”Ÿæˆ
     xd=zeros(1,Td/tao);zd=zeros(1,Td/tao);yd=zeros(1,Td/tao);
     for n = 1:Td/tao
-        xd(1,n)=0.4*cos(2*pi*n*tao/Td)^3;% ĞĞ¾ØÕó
+        xd(1,n)=0.4*cos(2*pi*n*tao/Td)^3;% è¡ŒçŸ©é˜µ
         yd(1,n)=0.4*sin(2*pi*n*tao/Td)^3;
         zd(1,n)=0.4*sin(2*pi*n*tao/Td)^3;
     end
-    pd=[xd;yd;zd];%Ò»ÁĞÒ»¸ö×ø±ê
+    pd=[xd;yd;zd];%ä¸€åˆ—ä¸€ä¸ªåæ ‡
     plot3(pd(1,:),pd(2,:),pd(3,:));
     hold on;
  
-%  ³õÊ¼»¯Win,W,Wout(t0),x(t0),thetai(t0),delta_thetai(t0)
-    Win=rand(400,15)-0.5;% ·¶Î§¡¾-0.5£¬0.5¡¿ 400x15
+%  åˆå§‹åŒ–Win,W,Wout(t0),x(t0),thetai(t0),delta_thetai(t0)
+    Win=rand(400,15)-0.5;% èŒƒå›´ã€-0.5ï¼Œ0.5ã€‘ 400x15
     W=rand(400,400);
-    W=W*0.8/vrho(W);% Æ×°ë¾¶0.8  vrho()¼ÆËãÆ×°ë¾¶
+    W=W*0.8/vrho(W);% è°±åŠå¾„0.8  vrho()è®¡ç®—è°±åŠå¾„
     Wout=zeros(6,400);% Wout(t0)=0
     x=zeros(400,1);% x(t0)=0;
-    tran=[1 0 0 0.5;0 1 0 0;0 0 1 0;0 0 0 1];% Éú³É³õÊ¼deltaiµÄ±ä»»¾ØÕó
-    thetai=Inverse_kinematics(tran);% ³õÊ¼×´Ì¬thetai
-    thetai=thetai.';% ±äÎªÁĞ¾ØÕó
-    delta_thetai=[0 0 0 0 0 0].';% ³õÊ¼×´Ì¬delta_thetai
-    pa=kinematics(thetai.');% ÕıÔË¶¯Ñ§½â
+    tran=[1 0 0 0.5;0 1 0 0;0 0 1 0;0 0 0 1];% ç”Ÿæˆåˆå§‹deltaiçš„å˜æ¢çŸ©é˜µ
+    thetai=Inverse_kinematics(tran);% åˆå§‹çŠ¶æ€thetai
+    thetai=thetai.';% å˜ä¸ºåˆ—çŸ©é˜µ
+    delta_thetai=[0 0 0 0 0 0].';% åˆå§‹çŠ¶æ€delta_thetai
+    pa=kinematics(thetai.');% æ­£è¿åŠ¨å­¦è§£
     pa=SE3(pa);
-    pa=transl(pa);% ÌáÈ¡³öÎ»ÖÃĞÅÏ¢
-    pa=pa.';% ³õÊ¼×´Ì¬ÏÂµÄpa
-%  LINµÄ²ÎÊı
+    pa=transl(pa);% æå–å‡ºä½ç½®ä¿¡æ¯
+    pa=pa.';% åˆå§‹çŠ¶æ€ä¸‹çš„pa
+%  LINçš„å‚æ•°
     h=2.2;l=0.6;
-%  ¿ªÊ¼
-for i=1:20  % ×ª20È¦
+%  å¼€å§‹
+for i=1:20  % è½¬20åœˆ
     for n=1:Td/tao
         delta_p=pd(:,n)-pa;% new deltai_p,new pd,old pa
-        u=[thetai;delta_p;delta_thetai];% new u,old thetai,new delta_p,ole delta_thetai   ÊäÈë²ã
-        % Ã»ÓĞLINµÄ´æ´¢²ã
+        u=[thetai;delta_p;delta_thetai];% new u,old thetai,new delta_p,ole delta_thetai   è¾“å…¥å±‚
+        % æ²¡æœ‰LINçš„å­˜å‚¨å±‚
         %x=sigmod(Win*u+W*x);% new x,new u,old x   
-        % LINµÄ´æ´¢²ã
+        % LINçš„å­˜å‚¨å±‚
         x=(1-h*l)*x+h*sigmod(Win*u+W*x);
-        p=x;% new p,new x    ÂÛÎÄÀï¸øµÄ²»ÖªµÀÊ²Ã´²ã£¬¸öÈË¸Ğ¾õÃ»±ØÒª
+        p=x;% new p,new x    è®ºæ–‡é‡Œç»™çš„ä¸çŸ¥é“ä»€ä¹ˆå±‚ï¼Œä¸ªäººæ„Ÿè§‰æ²¡å¿…è¦
         % max(max(abs(Wout*p)))
-        delta_thetai=tanh(Wout*p);% new delta_thetai,old Wout,new p      µÃµ½ ESN Êä³ö
-        thetai=thetai+delta_thetai;% new thetai,old thetai,new delta_thatai   µÃµ½ĞÂµÄthetai
-        if mod(n,30)==0 % Í¼Ïñ30²½Ò»±ê
-            robot.plot(thetai.');% new thetai     ¿ØÖÆ»úÆ÷ÈË
+        delta_thetai=tanh(Wout*p);% new delta_thetai,old Wout,new p      å¾—åˆ° ESN è¾“å‡º
+        thetai=thetai+delta_thetai;% new thetai,old thetai,new delta_thatai   å¾—åˆ°æ–°çš„thetai
+        if mod(n,30)==0 % å›¾åƒ30æ­¥ä¸€æ ‡
+            robot.plot(thetai.');% new thetai     æ§åˆ¶æœºå™¨äºº
         end
-        pa=kinematics(thetai.');% ÕıÔË¶¯Ñ§½â    
+        pa=kinematics(thetai.');% æ­£è¿åŠ¨å­¦è§£    
         pa=SE3(pa);
-        pa=transl(pa);% ÌáÈ¡³öÎ»ÖÃĞÅÏ¢    
-        pa=pa.';% new pa     µÃµ½Êµ¼ÊÎ»ÖÃ
+        pa=transl(pa);% æå–å‡ºä½ç½®ä¿¡æ¯    
+        pa=pa.';% new pa     å¾—åˆ°å®é™…ä½ç½®
         if mod(n,30)==0
-            plot3(pa(1,1),pa(2,1),pa(3,1),'r.');  % ±ê³öÊµ¼ÊÎ»ÖÃ
+            plot3(pa(1,1),pa(2,1),pa(3,1),'r.');  % æ ‡å‡ºå®é™…ä½ç½®
         end
-        J=robot.jacob0;    % ÑÅ¿É±È¾ØÕó
-        % ÆäÖĞÇ°3ĞĞ´ú±í»úÆ÷ÈËÄ©¶Ë×ø±êÏµÏßËÙ¶ÈµÄ´«µİ±È£»ºó3ĞĞ´ú±í¶ÔÊÖ×¦µÄ½ÇËÙ¶ÈµÄ´«µİ±È
+        J=robot.jacob0(thetai.','trans');    % é›…å¯æ¯”çŸ©é˜µ
+        % å…¶ä¸­å‰3è¡Œä»£è¡¨æœºå™¨äººæœ«ç«¯åæ ‡ç³»çº¿é€Ÿåº¦çš„ä¼ é€’æ¯”ï¼›å3è¡Œä»£è¡¨å¯¹æ‰‹çˆªçš„è§’é€Ÿåº¦çš„ä¼ é€’æ¯”
         % J=[J(1,:);J(2,:);J(3,:)];
-        pinv_J=pinv(J);  % Î±Äæ 
-        % ³¢ÊÔ½â¾öÆæÒìµãÎÊÌâ
+        pinv_J=pinv(J);  % ä¼ªé€† 
+        % å°è¯•è§£å†³å¥‡å¼‚ç‚¹é—®é¢˜
 
-        % ÕÒ²»µ½·½·¨
-        e=pinv_J*(pd(:,n)-pa);% new e,new pd,new pa   µÃµ½e
-        delta_Wout=e*p.';   %  ¸üĞÂWout
-        Wout=Wout+0.001*delta_Wout;   %  ×¢ÒâÏµÊı£¬Ó°ÏìºÜ´ó£¬¶øÇÒºÍtao¹ØÏµºÜ´ó
+        % æ‰¾ä¸åˆ°æ–¹æ³•
+        e=pinv_J*(pd(:,n)-pa);% new e,new pd,new pa   å¾—åˆ°e
+        delta_Wout=e*p.';   %  æ›´æ–°Wout
+        Wout=Wout+0.001*delta_Wout;   %  æ³¨æ„ç³»æ•°ï¼Œå½±å“å¾ˆå¤§ï¼Œè€Œä¸”å’Œtaoå…³ç³»å¾ˆå¤§
     end
-    clf;  %Çå¿ÕÍ¼Ïñ£¬»­µÚ¶şÂÖÍ¼Ïñ
+    clf;  %æ¸…ç©ºå›¾åƒï¼Œç”»ç¬¬äºŒè½®å›¾åƒ
     plot3(pd(1,:),pd(2,:),pd(3,:));
     hold on;
 end
-% ÓĞ¸ö·Ç³£ÑÏÖØµÄÎÊÌâ£¬Ò»µ©Åöµ½ÆæÒìµã£¬»ù±¾ÄÑÒÔÍê³ÉÈÎÎñ
+% æœ‰ä¸ªéå¸¸ä¸¥é‡çš„é—®é¢˜ï¼Œä¸€æ—¦ç¢°åˆ°å¥‡å¼‚ç‚¹ï¼ŒåŸºæœ¬éš¾ä»¥å®Œæˆä»»åŠ¡
