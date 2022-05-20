@@ -1,57 +1,68 @@
 clear;clc;
-%   6Ræœºå™¨äººæ¨¡å‹ï¼Œåç§°modified puma560ã€‚
-%   å®šä¹‰æœºå™¨äºº a--è¿æ†é•¿åº¦ï¼Œd--è¿æ†åç§»é‡
+%   6R»úÆ÷ÈËÄ£ĞÍ£¬Ãû³Æmodified puma560¡£
+%   ¶¨Òå»úÆ÷ÈË a--Á¬¸Ë³¤¶È£¬d--Á¬¸ËÆ«ÒÆÁ¿
     a2=0.4318;a3=0.02032;d2=0.14909;d4=0.43307;
-%		     thetai    di      ai-1        alphai-1               å…³èŠ‚å˜é‡å–å€¼èŒƒå›´ï¼Œè§’åº¦åˆ¶    
-    L1 = Link([pi/2    0       0               0], 'modified');%-160ï¼Œ160
-    L2 = Link([0       d2      0           -pi/2], 'modified');%-225ï¼Œ45
-    L3 = Link([-pi/2   0       a2              0], 'modified');%-45ï¼Œ225
-    L4 = Link([0       d4      a3          -pi/2], 'modified');%-110ï¼Œ170
-    L5 = Link([0       0  	   0            pi/2], 'modified');%-100ï¼Œ100
-    L6 = Link([0       0       0           -pi/2], 'modified');%-200ï¼Œ200
+%		     thetai    di      ai-1        alphai-1               ¹Ø½Ú±äÁ¿È¡Öµ·¶Î§£¬½Ç¶ÈÖÆ    
+    L1 = Link([pi/2    0       0               0], 'modified');%-160£¬160
+    L2 = Link([0       d2      0           -pi/2], 'modified');%-225£¬45
+    L3 = Link([-pi/2   0       a2              0], 'modified');%-45£¬225
+    L4 = Link([0       d4      a3          -pi/2], 'modified');%-110£¬170
+    L5 = Link([0       0  	   0            pi/2], 'modified');%-100£¬100
+    L6 = Link([0       0       0           -pi/2], 'modified');%-200£¬200
     robot = SerialLink([L1,L2,L3,L4,L5,L6]);
     robot.name = 'modified puma560';
 %   robot.display();
 %	robot.teach();
 %   robot.plot([0 0 0 0 0 0]);
-%   å›¾åƒç”Ÿæˆ
+%   Í¼ÏñÉú³É
     for n = 1:2000
-        xd(n)=0.4*cos(2*pi*n/2000)^3;% è¡ŒçŸ©é˜µ
+        xd(n)=0.4*cos(2*pi*n/2000)^3;% ĞĞ¾ØÕó
         yd(n)=0.4*sin(2*pi*n/2000)^3;
         zd(n)=0.4*sin(2*pi*n/2000)^3;
     end
     pd=[xd;yd;zd];
     %plot3(pd(1,:),pd(2,:),pd(3,:));
     %hold on;
-%åˆå§‹åŒ–
-    pa=[1 0 0 0.5;0 1 0 0;0 0 1 0;0 0 0 1];
+%³õÊ¼»¯
+    pa=[1 0 0 0.4;0 1 0 0.0;0 0 1 0;0 0 0 1];
     thetai=Inverse_kinematics(pa);
-    thetai=thetai.';% åˆå§‹çŠ¶æ€thetai
-    delta_thetai=[0 0 0 0 0 0].';% åˆå§‹çŠ¶æ€delta_thetai
-%   è·å–MLPè®­ç»ƒéœ€è¦çš„æ•°æ®é›†
-    Nt=5000;
+    thetai=thetai.';% ³õÊ¼×´Ì¬thetai
+    delta_thetai=[0 0 0 0 0 0].';% ³õÊ¼×´Ì¬delta_thetai
+%   »ñÈ¡MLPÑµÁ·ĞèÒªµÄÊı¾İ¼¯
+    Nt=16000;
     train_input=zeros(12,Nt);train_out=zeros(6,Nt);
     for i=1:Nt
+        if mod(i,1000)==0
+            pa=[1 0 0 pd(1,2000/16*i/1000);0 1 0 pd(2,2000/16*i/1000);0 0 1 pd(3,2000/16*i/1000);0 0 0 1];
+            thetai=Inverse_kinematics(pa);
+            thetai=thetai.';% ³õÊ¼×´Ì¬thetai
+            delta_thetai=[0 0 0 0 0 0].';
+        end
         pa=kinematics(thetai.');
         pa=SE3(pa);
-        pa=transl(pa);% è·å¾—æ—§æ—¶åˆ»EEFä½ç½®ä¿¡æ¯
+        pa=transl(pa);% »ñµÃ¾ÉÊ±¿ÌEEFÎ»ÖÃĞÅÏ¢
         pa=pa.';
-        old_thetai=thetai;% è®°å½•æ—§æ—¶åˆ»thetai
-        incre_thetai=0.01*pi*2*(rand(6,1)-0.5);% éšæœºäº§ç”Ÿå…³èŠ‚è§’åº¦å¢é‡å¹¶è°ƒæ•´
-        thetai=thetai+incre_thetai;% æ–°thetai
+        old_thetai=thetai;% ¼ÇÂ¼¾ÉÊ±¿Ìthetai
+        incre_thetai=0.01*pi*2*(rand(6,1)-0.5);% Ëæ»ú²úÉú¹Ø½Ú½Ç¶ÈÔöÁ¿²¢µ÷Õû
+        thetai=thetai+incre_thetai;% ĞÂthetai
+        while max(max(abs(pinv(robot.jacob0(thetai.')))))>10
+            incre_thetai=0.01*pi*2*(rand(6,1)-0.5);% ÖØĞÂËæ»ú²úÉú¹Ø½Ú½Ç¶ÈÔöÁ¿²¢µ÷Õû
+            thetai=thetai+incre_thetai;
+        end
         new_pa=kinematics(thetai.');
         new_pa=SE3(new_pa);
-        new_pa=transl(new_pa);% è·å¾—æ–°æ—¶åˆ»EEFä½ç½®ä¿¡æ¯
+        new_pa=transl(new_pa);% »ñµÃĞÂÊ±¿ÌEEFÎ»ÖÃĞÅÏ¢
         new_pa=new_pa.';
         train_input(:,i)=[new_pa;old_thetai;pa];
         train_out(:,i)=incre_thetai;
         
     end
-% è®­ç»ƒMLPç½‘ç»œ
+% ÑµÁ·MLPÍøÂç
     net = fitnet(40);
     net = train(net,train_input,train_out); 
     view(net);
     save('net.mat.mat','net');
+    save('train.mat.mat','train_input','train_out');
     
     x=net(train_input);
     y=train_out;
