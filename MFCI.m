@@ -1,6 +1,6 @@
 clear;clc;
-load('net1.mat.mat');
-load('net1.mat.mat');
+load('net.mat.mat');
+load('net.mat.mat');
 Td=20;tao=0.01;rou=0.5;h=2.2;l=0.6;
 
 %   6R机器人模型，名称modified puma560。
@@ -20,9 +20,9 @@ Td=20;tao=0.01;rou=0.5;h=2.2;l=0.6;
 %   robot.plot([0 0 0 0 0 0]);
 %   图像生成
     for n = 1:Td/tao
-        xd(1,n)=0.4*cos(2*pi*n*tao/Td)^3;% 行矩阵
-        yd(1,n)=0.4*sin(2*pi*n*tao/Td)^3;
-        zd(1,n)=0.4*sin(2*pi*n*tao/Td)^3;
+        xd(1,n)=0.1*cos(2*pi*n*tao/Td)^3+0.6;% 行矩阵
+        yd(1,n)=0.1*sin(2*pi*n*tao/Td)^3;
+        zd(1,n)=0.1*sin(2*pi*n*tao/Td)^3+0.2;
     end
 %     for n = 1:Td/tao
 %         xd(1,n)=0.2*rou*cos(6*pi*n*tao/Td)+0.5*rou*cos(4*pi*n*tao/Td)-0.7*rou+0.5;% 行矩阵
@@ -39,9 +39,10 @@ Td=20;tao=0.01;rou=0.5;h=2.2;l=0.6;
     Wout=zeros(3,400);% Wout(t0)=0
     x=zeros(400,1);% x(t0)=0;
     %pa=[1 0 0 0.5;0 1 0 -0.5;0 0 1 0;0 0 0 1];
-    pa=[1 0 0 0.4;0 1 0 0;0 0 1 0;0 0 0 1];
+    pa=[1 0 0 0.7;0 1 0 0;0 0 1 0.2;0 0 0 1];
     thetai=Inverse_kinematics(pa);
     thetai=thetai.';% 初始状态thetai
+    thetai=[1;1;1;0;0;0].*thetai;
     delta_thetai=[0 0 0 0 0 0].';% 初始状态delta_thetai
     pa=kinematics(thetai.');% 正运动学解
     pa=SE3(pa);
@@ -63,8 +64,11 @@ for i=1:20
         y=tanh(Wout*p);% new y,old Wout,new p
         pd_adjust=pd(:,n)+y;% all new
         old_thetai=thetai;% 记录old thetai
+        old_thetai=[1;1;1;0;0;0].*old_thetai;
         incre_thetai=net([pd_adjust;old_thetai;pa]);
+        incre_thetai=[1;1;1;0;0;0].*incre_thetai;
         thetai=thetai+incre_thetai;% new thetai,new pd_adjust,old thetai,old pa
+        thetai=[1;1;1;0;0;0].*thetai;
         delta_thetai=thetai-old_thetai;% new delta_thetai,new thetai,ole thetai
         pa=kinematics(thetai.');% new pa,new thetai
         pa=SE3(pa);
@@ -75,9 +79,10 @@ for i=1:20
         Wout=Wout+0.001*delta_Wout;% new Wout,old Wout,new delta_Wout
     end
     clf;
-    pa_adjust=[1 0 0 pa(1,1);0 1 0 pa(2,1);0 0 1 pa(3,1);0 0 0 1];%%%% 就离谱
-    thetai=Inverse_kinematics(pa_adjust);
-    thetai=thetai.';
+%     pa_adjust=[1 0 0 pa(1,1);0 1 0 pa(2,1);0 0 1 pa(3,1);0 0 0 1];%%%% 就离谱
+%     thetai=Inverse_kinematics(pa_adjust);
+%     thetai=thetai.';
+    i
     plot3(pd(1,:),pd(2,:),pd(3,:));
     hold on;
 end
